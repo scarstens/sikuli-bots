@@ -78,7 +78,7 @@
 Settings.MoveMouseDelay = <span class="dig">0.5</span> <span class="cmt"># default 2 times a second</span>
 Settings.ObserveScanRate = <span class="dig">0.333</span> <span class="cmt"># default 3 times a second</span>
 Settings.DelayBeforeMouseDown = <span class="dig">0.5</span> <span class="cmt"># only applies to next click</span>
-<span class="cmt">#setFindFailedResponse(RETRY) # try forver on fail - doesn't seem to play nice right now</span>
+<span class="cmt">#setFindFailedResponse(PROMPT) # try forver on fail - doesn't seem to play nice right now</span>
 
 <span class="cmt"># define globals</span>
 debug_popups = False
@@ -206,7 +206,7 @@ Env.addHotkey(Key.SPACE, KeyModifier.CTRL, runHotKey)
         mouseUp(Button.LEFT)
         <span class="kw">return</span> True
     <span class="kw">elif</span> exists( img_town_window ):
-        hover ( Pattern(img_mana_bar).targetOffset(<span class="dig">0</span>,<span class="dig">20</span>) )
+        hover ( Pattern(img_mana_bar).targetOffset(<span class="dig">0</span>,-<span class="dig">24</span>) )
         mouseDown(Button.RIGHT)
         <span class="skw">sleep</span>(<span class="dig">2</span>)
         mouseUp(Button.RIGHT)

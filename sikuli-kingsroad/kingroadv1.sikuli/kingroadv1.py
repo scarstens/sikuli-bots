@@ -6,7 +6,7 @@
 Settings.MoveMouseDelay = 0.5 # default 2 times a second
 Settings.ObserveScanRate = 0.333 # default 3 times a second
 Settings.DelayBeforeMouseDown = 0.5 # only applies to next click
-#setFindFailedResponse(RETRY) # try forver on fail - doesn't seem to play nice right now
+#setFindFailedResponse(PROMPT) # try forver on fail - doesn't seem to play nice right now
 
 # define globals
 debug_popups = False
@@ -134,7 +134,7 @@ def moveToMapNPC():
         mouseUp(Button.LEFT)
         return True
     elif exists( img_town_window ):
-        hover ( Pattern(img_mana_bar).targetOffset(0,20) )
+        hover ( Pattern(img_mana_bar).targetOffset(0,-24) )
         mouseDown(Button.RIGHT)
         sleep(2)
         mouseUp(Button.RIGHT)
