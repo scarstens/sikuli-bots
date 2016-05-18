@@ -116,7 +116,7 @@ img_goldbonus = Pattern(<img src="img_goldbonus.png" />).similar(<span class="di
 img_declineinvite = <img src="img_declineinvite.png" />
 img_accept = <img src="img_accept.png" />
 img_playalone = <img src="img_playalone.png" />
-img_auto = <img src="img_autoplay.png" />
+img_auto = Pattern(<img src="img_autoplay.png" />).similar(<span class="dig">0.85</span>)
 img_free = <img src="img_free.png" />
 img_acheivements = <img src="img_acheivements.png" />
 img_end_level = <img src="img_end_level.png" />
@@ -275,8 +275,8 @@ Env.addHotkey(Key.SPACE, KeyModifier.CTRL, runHotKey)
         hover( rgn_auto )
         left_mouse_click()
         hover( rgn_auto.offset(Location(<span class="dig">0</span>, <span class="dig">50</span>)) )
-        <span class="skw">sleep</span>(<span class="dig">1</span>)
-        autorunning = exists( img_auto, <span class="dig">1</span>)
+        <span class="skw">sleep</span>(<span class="dig">2</span>)
+        autorunning = <span class="kw">not</span> exists( img_auto, <span class="dig">1</span>)
     notify(<span class="str">'Confirmed auto running clicked.'</span>)
     maybeBlessing()
 

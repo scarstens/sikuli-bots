@@ -44,7 +44,7 @@ img_goldbonus = Pattern("img_goldbonus.png").similar(0.40)
 img_declineinvite = "img_declineinvite.png"
 img_accept = "img_accept.png"
 img_playalone = "img_playalone.png"
-img_auto = "img_autoplay.png"
+img_auto = Pattern("img_autoplay.png").similar(0.85)
 img_free = "img_free.png"
 img_acheivements = "img_acheivements.png"
 img_end_level = "img_end_level.png"
@@ -203,8 +203,8 @@ def startAutoRun():
         hover( rgn_auto )
         left_mouse_click()
         hover( rgn_auto.offset(Location(0, 50)) )
-        sleep(1)
-        autorunning = exists( img_auto, 1)
+        sleep(2)
+        autorunning = not exists( img_auto, 1)
     notify('Confirmed auto running clicked.')
     maybeBlessing()
     
