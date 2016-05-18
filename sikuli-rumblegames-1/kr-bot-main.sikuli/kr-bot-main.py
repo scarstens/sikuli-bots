@@ -80,7 +80,7 @@ def notify(message):
 
 # detects if the game is still open based on window title
 def isGameOpen(): 
-    global game_available
+    global game, game_available
     game = App('KingsRoad')
     switchApp(game)
     game_available = game.hasWindow()
@@ -216,12 +216,24 @@ def maybeBlessing():
     notify("Blessing and popup closure complete.")
 
 def waitForEndLevel():
-    notify("Waiting for end of level now...")
-    wait( img_end_level, 300 )
-    click ( img_end_level )
-    notify("End of level found, returning to town")
-    wait( img_return_to_town, 10 )
-    click( img_return_to_town )
+    global game, continue_run
+    notify("Waiting for end of level now... will try twice then return to town")
+    attempt = 1
+    success = False
+    while attempt < 3 and not success and wait( img_end_level, 300 ):
+        notify("End of level found, returning to town")
+        click ( img_end_level )
+        wait( img_return_to_town, 10 )
+        #image starts disabled wait a moment
+        sleep(1)
+        click( img_return_to_town )
+        success = not exists( img_end_level )
+        attempt = attempt + 1
+        return True
+    notify("End of level failed, safest course of action is to refresh.")
+    game.close()
+    continue_run = False
+    return False
 
 def setup_game_regions(show = 0):
     global rgn_game, rgn_top_bar, rgn_top_left, rgn_top_right, rgn_bottom_left, rgn_bottom_right
@@ -251,17 +263,19 @@ def setup_game_regions(show = 0):
         notify("Error: Game icon disappeared")
         return False
 
-op_play_type = ("autoplay", "debug")
+op_play_type = ("autoplay", "autoplay-notify", "debug")
 option = select("Please choose a bot play type", options = op_play_type);
 
 # main constructor (init run)
 while( running ):
     notify("Running Loop - moving to chosen play type.")
-    if option == op_play_type[1]:
+    if option == op_play_type[2]:
         setup_game_regions(0)
-        startAutoRun()
+        waitForEndLevel()
         option = select("Please choose a bot play type", options = op_play_type);
     else:
+        if option == op_play_type[1]:
+            debug_popups = True
         if False == isGameOpen():
             notify("Opening browser, game not found.")
             openApp(r"C:\Program Files\Google\Chrome\Application\chrome.exe https://apps.facebook.com/kingsroadgame/ -start-maximized")
@@ -294,6 +308,6 @@ while( running ):
                         notify("Beginning waitforEndLevel")
                         waitForEndLevel()
                         notify("End of waitForEndLevel")
-                    
+              #end of main loop, starting over
 # END OF FILE
 popup("KingsRoad Is Complete!")

@@ -152,7 +152,7 @@ Env.addHotkey(Key.SPACE, KeyModifier.CTRL, runHotKey)
 
 <span class="cmt"># detects if the game is still open based on window title</span>
 <span class="kw">def</span> isGameOpen():
-    <span class="kw">global</span> game_available
+    <span class="kw">global</span> game, game_available
     game = App(<span class="str">'KingsRoad'</span>)
     switchApp(game)
     game_available = game.hasWindow()
@@ -288,12 +288,24 @@ Env.addHotkey(Key.SPACE, KeyModifier.CTRL, runHotKey)
     notify(<span class="str">"Blessing and popup closure complete."</span>)
 
 <span class="kw">def</span> waitForEndLevel():
-    notify(<span class="str">"Waiting for end of level now..."</span>)
-    <span class="skw">wait</span>( img_end_level, <span class="dig">300</span> )
-    <span class="skw">click</span> ( img_end_level )
-    notify(<span class="str">"End of level found, returning to town"</span>)
-    <span class="skw">wait</span>( img_return_to_town, <span class="dig">10</span> )
-    <span class="skw">click</span>( img_return_to_town )
+    <span class="kw">global</span> game, continue_run
+    notify(<span class="str">"Waiting for end of level now... will try twice then return to town"</span>)
+    attempt = <span class="dig">1</span>
+    success = False
+    <span class="kw">while</span> attempt &lt; <span class="dig">3</span> <span class="kw">and</span> <span class="kw">not</span> success <span class="kw">and</span> <span class="skw">wait</span>( img_end_level, <span class="dig">300</span> ):
+        notify(<span class="str">"End of level found, returning to town"</span>)
+        <span class="skw">click</span> ( img_end_level )
+        <span class="skw">wait</span>( img_return_to_town, <span class="dig">10</span> )
+        <span class="cmt">#image starts disabled wait a moment</span>
+        <span class="skw">sleep</span>(<span class="dig">1</span>)
+        <span class="skw">click</span>( img_return_to_town )
+        success = <span class="kw">not</span> exists( img_end_level )
+        attempt = attempt + <span class="dig">1</span>
+        <span class="kw">return</span> True
+    notify(<span class="str">"End of level failed, safest course of action is to refresh."</span>)
+    game.close()
+    continue_run = False
+    <span class="kw">return</span> False
 
 <span class="kw">def</span> setup_game_regions(show = <span class="dig">0</span>):
     <span class="kw">global</span> rgn_game, rgn_top_bar, rgn_top_left, rgn_top_right, rgn_bottom_left, rgn_bottom_right
@@ -323,17 +335,19 @@ Env.addHotkey(Key.SPACE, KeyModifier.CTRL, runHotKey)
         notify(<span class="str">"Error: Game icon disappeared"</span>)
         <span class="kw">return</span> False
 
-op_play_type = (<span class="str">"autoplay"</span>, <span class="str">"debug"</span>)
+op_play_type = (<span class="str">"autoplay"</span>, <span class="str">"autoplay-notify"</span>, <span class="str">"debug"</span>)
 option = select(<span class="str">"Please choose a bot play type"</span>, options = op_play_type);
 
 <span class="cmt"># main constructor (init run)</span>
 <span class="kw">while</span>( running ):
     notify(<span class="str">"Running Loop - moving to chosen play type."</span>)
-    <span class="kw">if</span> option == op_play_type[<span class="dig">1</span>]:
+    <span class="kw">if</span> option == op_play_type[<span class="dig">2</span>]:
         setup_game_regions(<span class="dig">0</span>)
-        startAutoRun()
+        waitForEndLevel()
         option = select(<span class="str">"Please choose a bot play type"</span>, options = op_play_type);
     <span class="kw">else</span>:
+        <span class="kw">if</span> option == op_play_type[<span class="dig">1</span>]:
+            debug_popups = True
         <span class="kw">if</span> False == isGameOpen():
             notify(<span class="str">"Opening browser, game not found."</span>)
             openApp(<span class="str">r"C:\Program Files\Google\Chrome\Application\chrome.exe https://apps.facebook.com/kingsroadgame/ -start-maximized"</span>)
@@ -366,7 +380,7 @@ option = select(<span class="str">"Please choose a bot play type"</span>, option
                         notify(<span class="str">"Beginning waitforEndLevel"</span>)
                         waitForEndLevel()
                         notify(<span class="str">"End of waitForEndLevel"</span>)
-
+              <span class="cmt">#end of main loop, starting over</span>
 <span class="cmt"># END OF FILE</span>
 <span class="skw">popup</span>(<span class="str">"KingsRoad Is Complete!"</span>)
 </pre>
