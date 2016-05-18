@@ -1,0 +1,317 @@
+
+<html>
+   <head>
+      <style type="text/css">
+         .sikuli-code {
+            font-size: 20px;
+            font-family: "Osaka-mono", Monospace;
+            line-height: 1.5em;
+            display:table-cell;
+            white-space: pre-wrap;       /* css-3 */
+            white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 */
+            white-space: -o-pre-wrap;    /* Opera 7 */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+            width: 99%;   /* remove horizontal scroll-bar when viewing in IE7 */
+         }
+         .sikuli-code img {
+            vertical-align: middle;
+            margin: 2px;
+            border: 1px solid #ccc;
+            padding: 2px;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            -moz-box-shadow: 1px 1px 1px gray;
+            -webkit-box-shadow: 1px 1px 2px gray;
+         }
+         .kw {
+            color: blue;
+         }
+         .skw {
+            color: rgb(63, 127, 127);
+         }
+
+         .str {
+            color: rgb(128, 0, 0);
+         }
+
+         .dig {
+            color: rgb(128, 64, 0);
+         }
+
+         .cmt {
+            color: rgb(200, 0, 200);
+         }
+
+         h2 {
+            display: inline;
+            font-weight: normal;
+         }
+
+         .info {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+            display: none;
+         }
+
+         a {
+            color: #9D2900;
+         }
+
+         body {
+            font-family: "Trebuchet MS", Arial, Sans-Serif;
+         }
+
+      </style>
+   </head>
+<body>
+<div class="info">
+<h2>kingroadv1.sikuli</h2> <a href="kingroadv1.zip">(Download this script)</a>
+</div>
+<pre class="sikuli-code">
+<span class="cmt"># TODO:</span>
+<span class="cmt"># OPEN LOCKBOXES: http://doc.sikuli.org/finder.html?highlight=rows</span>
+
+
+<span class="cmt"># Global Settings to start with - these can be changed later</span>
+Settings.MoveMouseDelay = <span class="dig">0.5</span> <span class="cmt"># default 2 times a second</span>
+Settings.ObserveScanRate = <span class="dig">0.333</span> <span class="cmt"># default 3 times a second</span>
+Settings.DelayBeforeMouseDown = <span class="dig">0.5</span> <span class="cmt"># only applies to next click</span>
+<span class="cmt">#setFindFailedResponse(PROMPT) # try forver on fail - doesn't seem to play nice right now</span>
+
+<span class="cmt"># define globals</span>
+debug_popups = True
+running = True
+game_available = True
+logged_in = True
+auto_run_loop = False
+auto_run_count = <span class="dig">0</span>
+fail_to_run = <span class="dig">0</span>
+map_to_run = <span class="dig">0</span>
+map_mode_to_run = <span class="dig">2</span>
+continue_run = True
+
+
+<span class="cmt">#define regions</span>
+regn_screen = getBounds()
+rgn_top_bar = Region(<span class="dig">5</span>,<span class="dig">63</span>,<span class="dig">1620</span>,<span class="dig">118</span>)
+rgn_top_left = Region(<span class="dig">0</span>,<span class="dig">2</span>,<span class="dig">248</span>,<span class="dig">196</span>)
+rgn_top_right = Region(<span class="dig">1306</span>,<span class="dig">107</span>,<span class="dig">317</span>,<span class="dig">256</span>)
+
+
+<span class="cmt"># define images</span>
+img_game_icon = <img src="img_game_icon.png" />
+img_play = <img src="img_play.png" />
+img_refresh = Pattern(<img src="img_refresh.png" />).similar(<span class="dig">0.80</span>)
+img_toclose = <img src="img_toclose.png" />
+img_toclose_2 = <img src="img_toclose_2.png" />
+img_yesconfirm = Pattern(<img src="img_yesconfirm.png" />).similar(<span class="dig">0.85</span>)
+img_gem = Pattern(<img src="img_gem.png" />).similar(<span class="dig">0.85</span>)
+img_town_statue_arm = Pattern(<img src="img_town_statue_arm.png" />).similar(<span class="dig">0.80</span>)
+img_town_window = <img src="img_town_window.png" />
+img_mana_bar = <img src="img_mana_bar.png" />
+img_zoomout = <img src="img_zoomout.png" />
+img_goldbonus = Pattern(<img src="img_goldbonus.png" />).similar(<span class="dig">0.40</span>)
+img_declineinvite = <img src="img_declineinvite.png" />
+img_accept = <img src="img_accept.png" />
+img_playalone = <img src="img_playalone.png" />
+img_auto = <img src="img_autoplay.png" />
+img_free = <img src="img_free.png" />
+img_acheivements = <img src="img_acheivements.png" />
+img_end_level = <img src="img_end_level.png" />
+img_boss_drops = Pattern(<img src="img_boss_drops.png" />).similar(<span class="dig">0.50</span>).targetOffset(-<span class="dig">46</span>,<span class="dig">7</span>)
+img_return_to_town = <img src="img_return_to_town.png" />
+
+<span class="cmt"># image collections</span>
+
+collection_maps = (<img src="adamars_sanctum.png" />,<img src="inner_circle.png" />,<img src="battlements.png" />)
+collection_npcs = (Pattern(<img src="npc_world.png" />).targetOffset(-<span class="dig">3</span>,<span class="dig">23</span>),Pattern(<img src="npc_helm.png" />).targetOffset(-<span class="dig">2</span>,<span class="dig">29</span>),Pattern(<img src="npc_dungeon-1.png" />).targetOffset(<span class="dig">1</span>,-<span class="dig">70</span>),Pattern(<img src="npc_swords.png" />).targetOffset(<span class="dig">0</span>,<span class="dig">27</span>),)
+collection_modes = (<img src="mode_normal.png" />,<img src="mode_heroic.png" />,<img src="mode_champion.png" />)
+collection_lockboxes = (<img src="lockbox_bossdrop.png" />,<img src="lockbox_dragon_blue.png" />,<img src="lockbox_prism.png" />,<img src="lockbox_skillrune.png" />,<img src="lockbox_heroessence.png" />,Pattern(<img src="locbox_xp.png" />).similar(<span class="dig">0.80</span>),<img src="lockbox_tournament.png" />,<img src="lockbox_tournament_2.png" />)
+collection_tournament_modes = (<img src="tournament_mode_bronze.png" />,<img src="tournament_mode_silver.png" />,<img src="tournament_mode_gold.png" />)
+
+<span class="cmt"># setting ctrl+space as a hotkey to tell the bot to quit gracefully at will</span>
+<span class="kw">def</span> runHotKey(event):
+    <span class="kw">global</span> running
+    running = False
+Env.addHotkey(Key.SPACE, KeyModifier.CTRL, runHotKey)
+
+<span class="cmt"># used to make sure popups only run when popups are enabled</span>
+<span class="kw">def</span> notify(message):
+    <span class="kw">if</span> debug_popups <span class="kw">and</span> message:
+        <span class="skw">popup</span>(message)
+
+<span class="cmt"># detects if the game is still open based on window title</span>
+<span class="kw">def</span> isGameOpen():
+    <span class="kw">global</span> game_available
+    game = App(<span class="str">'KingsRoad'</span>)
+    switchApp(game)
+    game_available = game.hasWindow()
+    notify(game.getWindow())
+    <span class="kw">return</span> game_available
+
+<span class="cmt"># Unused currently, but needs to check on the flash area and confirm flash didn't crash / stop working</span>
+<span class="kw">def</span> isFlashWorking():
+    <span class="kw">return</span> exists(img_game_icon)
+    <span class="skw">sleep</span>(<span class="dig">1</span>)
+
+<span class="cmt"># This thing is pretty slow, need a different way to check if logged in</span>
+<span class="kw">def</span> maybeLogin():
+    <span class="kw">global</span> logged_in
+    <span class="kw">if</span> exists(img_play, <span class="dig">1</span>):
+        <span class="skw">click</span>(img_play)
+        logged_in = True
+        <span class="skw">sleep</span>(<span class="dig">3</span>)
+        <span class="kw">return</span> True
+    <span class="kw">elif</span> exists(img_refresh, <span class="dig">1</span>):
+        hover(img_refresh)
+        mouseDown(Button.LEFT)
+        <span class="skw">sleep</span>(<span class="dig">0.3</span>)
+        mouseUp(Button.LEFT)
+        logged_in = True
+        <span class="skw">sleep</span>(<span class="dig">2</span>)
+        <span class="kw">return</span> True
+    <span class="kw">return</span> False
+
+<span class="kw">def</span> maybeClosePopups():
+    <span class="kw">if</span> exists(img_toclose):
+        <span class="skw">click</span>(img_toclose)
+        <span class="skw">sleep</span>(<span class="dig">1</span>)
+        <span class="kw">if</span> exists(img_yesconfirm):
+            <span class="skw">click</span>(img_yesconfirm)
+            <span class="skw">sleep</span>(<span class="dig">1</span>)
+        <span class="cmt"># return continue as true, we found one and there may be another</span>
+        <span class="kw">return</span> True
+    <span class="kw">else</span>:
+        <span class="cmt"># return continue as false, we are done</span>
+        <span class="kw">return</span> False
+
+<span class="kw">def</span> closeAllPopups():
+    <span class="kw">global</span> running
+    <span class="kw">while</span> ( running <span class="kw">and</span> maybeClosePopups() ):
+        <span class="skw">sleep</span>(<span class="dig">0.1</span>)
+        notify(<span class="str">'closed another popup...'</span>)
+
+<span class="kw">def</span> moveToMapNPC():
+    <span class="kw">global</span> continue_run
+    <span class="kw">if</span> exists( img_gem ):
+        hover( Pattern(img_gem).targetOffset(<span class="dig">5</span>,<span class="dig">50</span>) )
+        mouseDown(Button.RIGHT)
+        <span class="skw">sleep</span>(<span class="dig">2</span>)
+        mouseUp(Button.RIGHT)
+    <span class="kw">if</span> exists( img_town_statue_arm ):
+        hover( Pattern(img_town_statue_arm).targetOffset(-<span class="dig">110</span>,<span class="dig">0</span>) )
+        mouseDown(Button.LEFT)
+        <span class="skw">sleep</span>(<span class="dig">2</span>)
+        mouseUp(Button.LEFT)
+        <span class="kw">return</span> True
+    <span class="kw">elif</span> exists( img_town_window ):
+        hover ( Pattern(img_mana_bar).targetOffset(<span class="dig">0</span>,-<span class="dig">24</span>) )
+        mouseDown(Button.RIGHT)
+        <span class="skw">sleep</span>(<span class="dig">2</span>)
+        mouseUp(Button.RIGHT)
+        <span class="kw">if</span> exists( img_gem ):
+            hover( Pattern(img_gem).targetOffset(<span class="dig">5</span>,<span class="dig">50</span>) )
+            mouseDown(Button.RIGHT)
+            <span class="skw">sleep</span>(<span class="dig">2</span>)
+            mouseUp(Button.RIGHT)
+        <span class="kw">if</span> exists( img_town_statue_arm ):
+            hover( Pattern(img_town_statue_arm).targetOffset(-<span class="dig">110</span>,<span class="dig">0</span>) )
+            mouseDown(Button.LEFT)
+            <span class="skw">sleep</span>(<span class="dig">2</span>)
+            mouseUp(Button.LEFT)
+            <span class="kw">return</span> True
+    <span class="kw">else</span>:
+        continue_run = False
+    <span class="kw">return</span> False
+
+<span class="kw">def</span> maybeZoomOut():
+    <span class="kw">if</span> rgn_top_right.exists( img_zoomout ):
+        <span class="skw">click</span>( img_zoomout )
+        <span class="kw">return</span> True
+    <span class="kw">return</span> False
+
+<span class="kw">def</span> chooseMap():
+    <span class="kw">global</span> map_to_run
+    <span class="kw">if</span> exists( collection_maps[map_to_run] ):
+        <span class="skw">click</span>( collection_maps[map_to_run] )
+        notify(<span class="str">'Whoa, found that map you were looking for ;)'</span>);
+
+<span class="kw">def</span> chooseMode():
+    <span class="kw">global</span> continue_run
+    <span class="kw">if</span> exists( collection_modes[map_mode_to_run] ):
+        <span class="skw">click</span>( collection_modes[map_mode_to_run] )
+        <span class="skw">sleep</span>(<span class="dig">0.5</span>)
+        notify(<span class="str">'Hey man, I totally clicked on that map for you. Your welcome.'</span>)
+        <span class="kw">if</span> exists( img_playalone ):
+            <span class="skw">click</span>( img_playalone )
+            notify(<span class="str">'Yup, we confirmed playing solo.'</span>)
+        <span class="skw">sleep</span>(<span class="dig">2</span>)
+    <span class="kw">else</span>:
+        notify(<span class="str">'Something went wrong during choosing the mode.'</span>)
+        continue_run = False
+        exit
+
+<span class="kw">def</span> startAutoRun():
+    <span class="skw">wait</span>( img_auto, <span class="dig">20</span> )
+    <span class="skw">click</span>( img_auto )
+    <span class="skw">sleep</span>(<span class="dig">1</span>)
+    maybeBlessing()
+
+<span class="kw">def</span> maybeBlessing():
+    <span class="kw">if</span> exists( img_free ):
+        <span class="skw">click</span>( img_free )
+    <span class="kw">if</span> exists( img_acheivements ):
+        <span class="skw">click</span>( Pattern(img_acheivements).targetOffset(<span class="dig">0</span>,<span class="dig">55</span>) )
+
+<span class="kw">def</span> waitForEndLevel():
+    <span class="skw">wait</span>( img_end_level, <span class="dig">300</span> )
+    <span class="skw">click</span> ( img_end_level )
+    <span class="skw">wait</span>( img_return_to_town, <span class="dig">10</span> )
+    <span class="skw">click</span>( img_return_to_town )
+
+op_play_type = (<span class="str">"autoplay"</span>, <span class="str">"debug"</span>)
+option = select(<span class="str">"Please choose a bot play type"</span>, options = op_play_type);
+
+<span class="cmt"># main constructor (init run)</span>
+<span class="kw">while</span>( running ):
+    notify(<span class="str">"Main Loop"</span>)
+    <span class="kw">if</span> option == op_play_type[<span class="dig">1</span>]:
+        moveToMapNPC()
+        option = select(<span class="str">"Please choose a bot play type"</span>, options = op_play_type);
+    <span class="kw">else</span>:
+        <span class="kw">if</span> False == isGameOpen():
+            notify(<span class="str">"Opening browser, game not found."</span>)
+            openApp(<span class="str">r"C:\Program Files\Google\Chrome\Application\chrome.exe https://apps.facebook.com/kingsroadgame/ -start-maximized"</span>)
+            logged_in = False
+            <span class="skw">sleep</span>(<span class="dig">5</span>)
+        <span class="kw">else</span>:
+            <span class="cmt"># Reset continue run since we are starting over here </span>
+            continue_run = True
+            <span class="kw">if</span> False == logged_in:
+                <span class="skw">sleep</span>(<span class="dig">0.1</span>)
+                notify(<span class="str">'Not logged in yet :('</span>)
+            <span class="kw">if</span> maybeLogin():
+                <span class="skw">sleep</span>(<span class="dig">0.1</span>) <span class="cmt">#do anything on login?</span>
+            <span class="kw">if</span> logged_in:
+                notify(<span class="str">'Found you logged in!'</span>)
+                closeAllPopups()
+                <span class="kw">if</span>( moveToMapNPC() ):
+                    notify(<span class="str">"Phew, found the map dude."</span>)
+                    <span class="kw">if</span>( continue_run ):
+                        maybeZoomOut()
+                    <span class="kw">if</span>( continue_run ):
+                        chooseMap()
+                    <span class="kw">if</span>( continue_run ):
+                        chooseMode()
+                    <span class="kw">if</span>( continue_run ):
+                        startAutoRun()
+                    <span class="kw">if</span>( continue_run ):
+                        waitForEndLevel()
+
+<span class="cmt"># END OF FILE</span>
+<span class="skw">popup</span>(<span class="str">"KingsRoad Is Complete!"</span>)
+</pre>
+</body>
+</html>
