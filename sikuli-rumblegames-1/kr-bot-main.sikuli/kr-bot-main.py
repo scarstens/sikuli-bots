@@ -198,26 +198,32 @@ def chooseMode():
         exit
 
 def startAutoRun():
+    global continue_run
     autorunning = False
     while not autorunning:
-        rgn_auto = wait( img_auto, 20 )
-        hover( rgn_auto )
-        left_mouse_click()
-        hover( rgn_auto.offset(Location(0, 50)) )
-        sleep(2)
-        autorunning = not exists( img_auto, 1)
-    notify('Confirmed auto running clicked.')
-    maybeBlessing()
+        try:
+            rgn_auto = wait( img_auto, 20 )
+            hover( rgn_auto )
+            left_mouse_click()
+            hover( rgn_auto.offset(Location(0, 50)) )
+            sleep(2)
+            autorunning = not exists( img_auto, 1)
+        except FindFailed:
+            continue_run = False
+    if continue_run == True:
+        notify('Confirmed auto running clicked.')
+        maybeBlessing()
     
 def maybeBlessing():
-    if exists( img_free ):
+    if exists( img_free, 2 ):
         click( img_free )
-    if exists( img_acheivements ):
+    if exists( img_acheivements, 2 ):
         click( Pattern(img_acheivements).targetOffset(0,55) )
     notify("Blessing and popup closure complete.")
 
 def waitForEndLevel():
     global game, continue_run
+    #this is where you could do dynamic observes to watch for items, open lockboxes, or collect acheivements
     notify("Waiting for end of level now... will try twice then return to town")
     attempt = 1
     success = False

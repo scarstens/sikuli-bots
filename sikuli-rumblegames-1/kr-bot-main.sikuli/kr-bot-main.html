@@ -270,26 +270,32 @@ Env.addHotkey(Key.SPACE, KeyModifier.CTRL, runHotKey)
         exit
 
 <span class="kw">def</span> startAutoRun():
+    <span class="kw">global</span> continue_run
     autorunning = False
     <span class="kw">while</span> <span class="kw">not</span> autorunning:
-        rgn_auto = <span class="skw">wait</span>( img_auto, <span class="dig">20</span> )
-        hover( rgn_auto )
-        left_mouse_click()
-        hover( rgn_auto.offset(Location(<span class="dig">0</span>, <span class="dig">50</span>)) )
-        <span class="skw">sleep</span>(<span class="dig">2</span>)
-        autorunning = <span class="kw">not</span> exists( img_auto, <span class="dig">1</span>)
-    notify(<span class="str">'Confirmed auto running clicked.'</span>)
-    maybeBlessing()
+        <span class="kw">try</span>:
+            rgn_auto = <span class="skw">wait</span>( img_auto, <span class="dig">20</span> )
+            hover( rgn_auto )
+            left_mouse_click()
+            hover( rgn_auto.offset(Location(<span class="dig">0</span>, <span class="dig">50</span>)) )
+            <span class="skw">sleep</span>(<span class="dig">2</span>)
+            autorunning = <span class="kw">not</span> exists( img_auto, <span class="dig">1</span>)
+        <span class="kw">except</span> FindFailed:
+            continue_run = False
+    <span class="kw">if</span> continue_run == True:
+        notify(<span class="str">'Confirmed auto running clicked.'</span>)
+        maybeBlessing()
 
 <span class="kw">def</span> maybeBlessing():
-    <span class="kw">if</span> exists( img_free ):
+    <span class="kw">if</span> exists( img_free, <span class="dig">2</span> ):
         <span class="skw">click</span>( img_free )
-    <span class="kw">if</span> exists( img_acheivements ):
+    <span class="kw">if</span> exists( img_acheivements, <span class="dig">2</span> ):
         <span class="skw">click</span>( Pattern(img_acheivements).targetOffset(<span class="dig">0</span>,<span class="dig">55</span>) )
     notify(<span class="str">"Blessing and popup closure complete."</span>)
 
 <span class="kw">def</span> waitForEndLevel():
     <span class="kw">global</span> game, continue_run
+    <span class="cmt">#this is where you could do dynamic observes to watch for items, open lockboxes, or collect acheivements</span>
     notify(<span class="str">"Waiting for end of level now... will try twice then return to town"</span>)
     attempt = <span class="dig">1</span>
     success = False
