@@ -109,6 +109,9 @@ def maybeLogin():
     return False
 
 def maybeClosePopups():
+    if exists( img_toclose_2 ):
+        click()
+        sleep(1)
     if exists(img_toclose):
         notify('Found a popup, closing and looking again.')
         click(img_toclose)
