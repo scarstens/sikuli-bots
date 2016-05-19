@@ -182,6 +182,7 @@ Env.addHotkey(Key.SPACE, KeyModifier.CTRL, runHotKey)
 
 <span class="kw">def</span> maybeClosePopups():
     <span class="kw">if</span> exists(img_toclose):
+        notify(<span class="str">'Found a popup, closing and looking again.'</span>)
         <span class="skw">click</span>(img_toclose)
         <span class="skw">sleep</span>(<span class="dig">1</span>)
         <span class="kw">if</span> exists(img_yesconfirm):
@@ -191,13 +192,13 @@ Env.addHotkey(Key.SPACE, KeyModifier.CTRL, runHotKey)
         <span class="kw">return</span> True
     <span class="kw">else</span>:
         <span class="cmt"># return continue as false, we are done</span>
+        notify(<span class="str">'No more popups found, moving on.'</span>)
         <span class="kw">return</span> False
 
 <span class="kw">def</span> closeAllPopups():
     <span class="kw">global</span> running
     <span class="kw">while</span> ( running <span class="kw">and</span> maybeClosePopups() ):
         <span class="skw">sleep</span>(<span class="dig">0.1</span>)
-        notify(<span class="str">'closed another popup...'</span>)
 
 <span class="kw">def</span> moveToMapNPC():
     <span class="kw">global</span> continue_run

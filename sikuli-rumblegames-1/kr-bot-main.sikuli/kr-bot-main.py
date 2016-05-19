@@ -110,6 +110,7 @@ def maybeLogin():
 
 def maybeClosePopups():
     if exists(img_toclose):
+        notify('Found a popup, closing and looking again.')
         click(img_toclose)
         sleep(1)
         if exists(img_yesconfirm):
@@ -119,13 +120,13 @@ def maybeClosePopups():
         return True
     else:
         # return continue as false, we are done
+        notify('No more popups found, moving on.')
         return False
 
 def closeAllPopups():
     global running
     while ( running and maybeClosePopups() ):
         sleep(0.1)
-        notify('closed another popup...')
 
 def moveToMapNPC():
     global continue_run
