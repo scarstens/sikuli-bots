@@ -13,6 +13,7 @@ print "[S2P02] New Image Path: "+sikuli.getBundlePath()
 # define images
 img_game_icon = "img_game_icon.png"
 img_play = "img_play.png"
+img_town = "img_town.png"
 img_refresh = Pattern("img_refresh.png").similar(0.80)
 img_toclose = "img_toclose.png"
 img_toclose_2 = "img_toclose_2.png"
@@ -36,7 +37,7 @@ img_return_to_town = "img_return_to_town.png"
 # image collections
 
 
-collection_maps = (Pattern("adamars_sanctum.png").similar(0.60),"inner_circle.png","battlements.png")
+collection_maps = (Pattern("maps_adamars.png").similar(0.65),"inner_circle.png","battlements.png")
 collection_npcs = (Pattern("npc_world.png").targetOffset(-3,23),Pattern("npc_helm.png").targetOffset(-2,29),Pattern("npc_dungeon-1.png").targetOffset(1,-70),Pattern("npc_swords.png").targetOffset(0,27),)
 collection_modes = ("mode_normal.png","mode_heroic.png","mode_champion.png")
 collection_lockboxes = ("lockbox_bossdrop.png","lockbox_dragon_blue.png","lockbox_prism.png","lockbox_skillrune.png","lockbox_heroessence.png",Pattern("locbox_xp.png").similar(0.80),"lockbox_tournament.png","lockbox_tournament_2.png")

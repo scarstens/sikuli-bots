@@ -74,9 +74,10 @@ else:
 
 def debug_run():
     setup_game_regions(0)
+    chooseMap()
     #startAutoRun()
-    #waitForEndLevel()
-    moveToMapNPC()
+    waitForEndLevel()
+    #moveToMapNPC()
     #map = Pattern(img_collection.collection_maps[map_to_run])
     #if exists(map,1):
     #    print "[D1P00] 1920 exists as expected~"+map.getFilename()
@@ -172,6 +173,12 @@ def moveToMapNPC():
             hover( Pattern(img_collection.img_town_statue_arm).targetOffset(npc_offset,0) )
             mouse_click(2)
             return True
+    elif exists( img_collection.img_town, 1 ):
+        click()
+        wait(1)
+        if exists( img_collection.img_yesconfirm ):
+            click()
+            wait(4)
     else:
         continue_run = False
     return False
@@ -246,19 +253,23 @@ def waitForEndLevel():
     notify("Waiting for end of level now... will try twice then return to town")
     attempt = 1
     success = False
-    while attempt < 3 and not success and wait( img_collection.img_end_level, 300 ):
-        notify("End of level found, returning to town")
-        click ( img_collection.img_end_level )
-        wait( img_collection.img_return_to_town, 10 )
-        #image starts disabled wait a moment
-        sleep(1)
-        click( img_collection.img_return_to_town )
-        success = not exists( img_collection.img_end_level )
-        attempt = attempt + 1
-        return True
-    notify("End of level failed, safest course of action is to refresh.")
-    game.close()
-    continue_run = False
+    try:
+        while attempt < 3 and not success and wait( img_collection.img_end_level, 300 ):
+            notify("End of level found, returning to town")
+            click ( img_collection.img_end_level )
+            wait( img_collection.img_return_to_town, 10 )
+            #image starts disabled wait a moment
+            sleep(1)
+            click( img_collection.img_return_to_town )
+            success = not exists( img_collection.img_end_level )
+            attempt = attempt + 1
+            return True
+    except FindFailed:
+        notify("End of level failed, safest course of action is to refresh.")
+        #game.close()
+        click( img_collection.img_game_icon )
+        wait(6)
+        continue_run = False
     return False
 
 def setup_game_regions(show = 0):
