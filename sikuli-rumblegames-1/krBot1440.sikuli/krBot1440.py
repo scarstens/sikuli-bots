@@ -33,6 +33,8 @@ img_acheivements = "img_acheivements.png"
 img_end_level = "img_end_level.png"
 img_boss_drops = Pattern("img_boss_drops.png").similar(0.50).targetOffset(-46,7)
 img_return_to_town = "img_return_to_town.png"
+img_teamviewer_icon = "img_teamviewer_icon.png"
+img_teamviewer_ok = "img_teamviewer_ok.png"
 
 # image collections
 

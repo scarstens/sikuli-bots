@@ -75,7 +75,7 @@ else:
 def debug_run():
     setup_game_regions(0)
     chooseMap()
-    #startAutoRun()
+    startAutoRun()
     waitForEndLevel()
     #moveToMapNPC()
     #map = Pattern(img_collection.collection_maps[map_to_run])
@@ -134,13 +134,15 @@ def maybeClosePopups():
         sleep(1)
     if exists(img_collection.img_toclose):
         notify('Found a popup, closing and looking again.')
-        click(img_collection.img_toclose)
+        click()
         sleep(1)
         if exists(img_collection.img_yesconfirm):
-            click(img_collection.img_yesconfirm)
+            click()
             sleep(1)
         # return continue as true, we found one and there may be another
         return True
+    if exists( img_collection.img_teamviewer_icon, 1 ):
+        click( img_collection.img_teamviewer_ok )
     else:
         # return continue as false, we are done
         notify('No more popups found, moving on.')
@@ -150,7 +152,7 @@ def closeAllPopups():
     global running, img_collection
     while ( running and maybeClosePopups() ):
         sleep(0.1)
-
+        
 def moveToMapNPC():
     global continue_run, img_collection
     npc_offset = int( SCREEN.getBounds().width * -1 * 0.075 )
@@ -220,9 +222,12 @@ def chooseMode():
         exit
 
 def startAutoRun():
-    global auto_run_count, continue_run, img_collection
+    global auto_run_count, continue_run, img_collection, rgn_bottom_right
     autorunning = False
     while not autorunning:
+        if exists( img_collection.img_declineinvite, 1 ):
+            click()
+            wait(2)
         try:
             rgn_auto = wait( img_collection.img_auto, 20 )
             hover( rgn_auto )
