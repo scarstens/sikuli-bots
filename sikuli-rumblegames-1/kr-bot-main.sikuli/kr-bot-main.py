@@ -74,15 +74,59 @@ else:
 
 def debug_run():
     setup_game_regions(0)
-    chooseMap()
-    startAutoRun()
-    waitForEndLevel()
+    #chooseMap()
+    #startAutoRun()
+    #waitForEndLevel()
     #moveToMapNPC()
     #map = Pattern(img_collection.collection_maps[map_to_run])
     #if exists(map,1):
     #    print "[D1P00] 1920 exists as expected~"+map.getFilename()
+    open_lockboxes(1)
     exit(0)
-    
+
+# Open Lockboxes by level - level 1 only opens end of stage lion boxes
+def open_lockboxes(level = 1, max = 5):
+    type("i")
+    count = 1
+    Settings.WaitScanRate = 0.1
+    try:
+        hover( Pattern(img_collection.img_acheivements).targetOffset(5,50) )
+        if exists( img_collection.img_items_allitems ):
+            click()
+            notify("Clicked all items dropdown")
+            wait(1)
+        if exists( img_collection.img_items_otheritems ):
+            click()
+            notify("Clicked other items in dropdown")
+        if exists( img_collection.img_acheivements ):
+            hover()
+            notify("Moved mouse away from items window")
+    except:
+        notify("Something didn't find in lockbox open setup")
+    while count <= max and exists(img_collection.collection_lockboxes[0], 2 ):
+        click()
+        notify("Found lockbox " + str(count) )
+        wait(1)
+        try:
+            click( img_collection.img_open_icon )
+            wait(3)
+        except:
+            pass
+        
+        if exists( img_collection.img_lockbox_collector, 30 ):
+            click( )
+            wait(1)
+        else:
+            notify("Lockbox item collection failed :(")
+            
+        if exists( img_collection.img_no_icon, 4 ):
+            click()
+            count = count + 1;
+        else:
+            notify("Didn't find no icon properly")
+    Settings.WaitScanRate = 0.33
+    maybeClosePopups()
+
 # slow left mouse click
 def mouse_click(delay = 0.3, button = Button.LEFT):
     mouseDown(button)
@@ -304,7 +348,7 @@ def setup_game_regions(show = 0):
         notify("Error: Game icon disappeared")
         return False
 
-op_play_type = ("autoplay", "autoplay-notify", "debug")
+op_play_type = ("autoplay", "autoplay-notify", "lockboxes", "debug")
 if( not force_start_mode ):
     option = select("Please choose a bot play type", options = op_play_type);
 else:
@@ -315,6 +359,9 @@ while( running ):
     notify("Running Loop - moving to chosen play type.")
     if option == "debug":
         debug_run()
+        option = select("Please choose a bot play type", options = op_play_type);
+    elif option == "lockboxes":
+        open_lockboxes()
         option = select("Please choose a bot play type", options = op_play_type);
     elif option == "autoplay" or option == "autoplay-notify":
         if option == "autoplay-notify":

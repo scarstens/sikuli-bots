@@ -35,10 +35,13 @@ img_boss_drops = Pattern("img_boss_drops.png").similar(0.50).targetOffset(-46,7)
 img_return_to_town = "img_return_to_town.png"
 img_teamviewer_icon = "img_teamviewer_icon.png"
 img_teamviewer_ok = "img_teamviewer_ok.png"
+img_open_icon = "img_open_icon.png"
+img_lockbox_collector = Pattern("img_lockbox_collector.png").similar(0.35)
+img_no_icon = "img_no_icon.png"
+img_items_allitems = "img_items_allitems.png"
+img_items_otheritems = "img_items_otheritems.png"
 
-# image collections
-
-
+# Image collections
 collection_maps = (Pattern("maps_adamars.png").similar(0.65),"inner_circle.png","battlements.png")
 collection_npcs = (Pattern("npc_world.png").targetOffset(-3,23),Pattern("npc_helm.png").targetOffset(-2,29),Pattern("npc_dungeon-1.png").targetOffset(1,-70),Pattern("npc_swords.png").targetOffset(0,27),)
 collection_modes = ("mode_normal.png","mode_heroic.png","mode_champion.png")
