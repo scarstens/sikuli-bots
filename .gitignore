@@ -7,3 +7,4 @@ SikuliX.app/*
 sikuli-kingsroad/sikulix.jar
 sikuli-rumblegames-1/kr-bot-main.sikuli/*.png
 sikuli-rumblegames-1/krBot1440.sikuli/krBot1440$py.class
+*.log
