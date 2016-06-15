@@ -304,8 +304,10 @@ def waitForEndLevel():
     success = False
     try:
         while attempt < 3 and not success and wait( img_collection.img_end_level, 300 ):
-            notify("End of level found, returning to town")
+            notify("End of level found")
+            pickup_boss_drops()
             click ( img_collection.img_end_level )
+            notify("Returning to town")
             wait( img_collection.img_return_to_town, 10 )
             #image starts disabled wait a moment
             sleep(1)
@@ -320,6 +322,15 @@ def waitForEndLevel():
         wait(6)
         continue_run = False
     return False
+
+def pickup_boss_drops():
+    if exists( img_collection.img_boss_drops ):
+        notify("Picking up boss drops")
+        click()
+        click()
+        sleep(0.5)
+        click()
+        click()
 
 def setup_game_regions(show = 0):
     global rgn_game, rgn_top_bar, rgn_top_left, rgn_top_right, rgn_bottom_left, rgn_bottom_right, img_collection
