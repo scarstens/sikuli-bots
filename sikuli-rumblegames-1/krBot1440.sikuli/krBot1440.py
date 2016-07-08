@@ -45,6 +45,6 @@ img_items_otheritems = "img_items_otheritems.png"
 # Image collections
 collection_maps = (Pattern("maps_adamars.png").similar(0.65),"inner_circle.png","battlements.png")
 collection_npcs = (Pattern("npc_world.png").targetOffset(-3,23),Pattern("npc_helm.png").targetOffset(-2,29),Pattern("npc_dungeon-1.png").targetOffset(1,-70),Pattern("npc_swords.png").targetOffset(0,27),)
-collection_modes = ("mode_normal.png","mode_heroic.png","mode_champion.png")
+collection_modes = ("mode_normal.png","mode_heroic.png",Pattern("mode_champion.png").similar(0.61))
 collection_lockboxes = ("lockbox_bossdrop.png","lockbox_dragon_blue.png","lockbox_prism.png","lockbox_skillrune.png","lockbox_heroessence.png",Pattern("locbox_xp.png").similar(0.80),"lockbox_tournament.png","lockbox_tournament_2.png")
 collection_tournament_modes = ("tournament_mode_bronze.png","tournament_mode_silver.png","tournament_mode_gold.png")
