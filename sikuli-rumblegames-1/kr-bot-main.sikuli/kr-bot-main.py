@@ -13,6 +13,7 @@ Settings.DelayBeforeMouseDown = 0.5 # only applies to next click
 #setFindFailedResponse(PROMPT) # try forver on fail - doesn't seem to play nice right now
 
 # define globals
+pickups_on = False
 force_start_mode = False
 #force_start_mode = "debug"
 debug_popups = False
@@ -73,15 +74,61 @@ else:
 
 
 def debug_run():
-    setup_game_regions(0)
+    setup_game_regions(1)
+    chooseMap()
+    chooseMode()
     #startAutoRun()
     #waitForEndLevel()
-    moveToMapNPC()
+    #moveToMapNPC()
     #map = Pattern(img_collection.collection_maps[map_to_run])
     #if exists(map,1):
     #    print "[D1P00] 1920 exists as expected~"+map.getFilename()
+    #open_lockboxes(1)
     exit(0)
-    
+
+# Open Lockboxes by level - level 1 only opens end of stage lion boxes
+def open_lockboxes(level = 1, max = 5):
+    type("i")
+    count = 1
+    Settings.WaitScanRate = 0.1
+    try:
+        hover( Pattern(img_collection.img_acheivements).targetOffset(5,50) )
+        if exists( img_collection.img_items_allitems ):
+            click()
+            notify("Clicked all items dropdown")
+            wait(1)
+        if exists( img_collection.img_items_otheritems ):
+            click()
+            notify("Clicked other items in dropdown")
+        if exists( img_collection.img_acheivements ):
+            hover()
+            notify("Moved mouse away from items window")
+    except:
+        notify("Something didn't find in lockbox open setup")
+    while count <= max and exists(img_collection.collection_lockboxes[0], 2 ):
+        click()
+        notify("Found lockbox " + str(count) )
+        wait(1)
+        try:
+            click( img_collection.img_open_icon )
+            wait(3)
+        except:
+            pass
+        
+        if exists( img_collection.img_lockbox_collector, 30 ):
+            click( )
+            wait(1)
+        else:
+            notify("Lockbox item collection failed :(")
+            
+        if exists( img_collection.img_no_icon, 4 ):
+            click()
+            count = count + 1;
+        else:
+            notify("Didn't find no icon properly")
+    Settings.WaitScanRate = 0.33
+    maybeClosePopups()
+
 # slow left mouse click
 def mouse_click(delay = 0.3, button = Button.LEFT):
     mouseDown(button)
@@ -133,13 +180,18 @@ def maybeClosePopups():
         sleep(1)
     if exists(img_collection.img_toclose):
         notify('Found a popup, closing and looking again.')
-        click(img_collection.img_toclose)
+        click()
         sleep(1)
         if exists(img_collection.img_yesconfirm):
-            click(img_collection.img_yesconfirm)
+            click()
             sleep(1)
         # return continue as true, we found one and there may be another
         return True
+    if exists( img_collection.img_teamviewer_icon, 1 ):
+        try:
+            click( img_collection.img_teamviewer_ok )
+        except FindFailed:
+            notify("Teamview OK button not found.")
     else:
         # return continue as false, we are done
         notify('No more popups found, moving on.')
@@ -149,7 +201,7 @@ def closeAllPopups():
     global running, img_collection
     while ( running and maybeClosePopups() ):
         sleep(0.1)
-
+        
 def moveToMapNPC():
     global continue_run, img_collection
     npc_offset = int( SCREEN.getBounds().width * -1 * 0.075 )
@@ -157,23 +209,33 @@ def moveToMapNPC():
     if exists( img_collection.img_gem ):
         hover( Pattern(img_collection.img_gem).targetOffset(5,50) )
         mouse_click(2, Button.RIGHT)
-    if exists( img_collection.img_town_statue_arm ):
-        #maybe use 0.075 % of width
-        hover( Pattern(img_collection.img_town_statue_arm).targetOffset(npc_offset,0) )
-        mouse_click(2)
-        return True
-    elif exists( img_collection.img_town_window ):
-        hover ( Pattern(img_collection.img_mana_bar).targetOffset(0,-24) )
-        mouse_click(2, Button.RIGHT)
-        if exists( img_collection.img_gem ):
-            hover( Pattern(img_collection.img_gem).targetOffset(5,50) )
-            mouse_click(2, Button.RIGHT)
+    try:    
         if exists( img_collection.img_town_statue_arm ):
-            hover( Pattern(img_collection.img_town_statue_arm).targetOffset(npc_offset,0) )
-            mouse_click(2)
-            return True
-    else:
+            #maybe use 0.075 % of width
+                hover( Pattern(img_collection.img_town_statue_arm).targetOffset(npc_offset,0) )
+                mouse_click(2)
+                return True
+        elif exists( img_collection.img_town_window ):
+            hover ( Pattern(img_collection.img_mana_bar).targetOffset(0,-24) )
+            mouse_click(2, Button.RIGHT)
+            if exists( img_collection.img_gem ):
+                hover( Pattern(img_collection.img_gem).targetOffset(5,50) )
+                mouse_click(2, Button.RIGHT)
+            if exists( img_collection.img_town_statue_arm ):
+                hover( Pattern(img_collection.img_town_statue_arm).targetOffset(npc_offset,0) )
+                mouse_click(2)
+                return True
+        elif exists( img_collection.img_town, 1 ):
+            click()
+            wait(1)
+            if exists( img_collection.img_yesconfirm ):
+                click()
+                wait(4)
+        else:
+            continue_run = False
+    except FindFailed:
         continue_run = False
+        return False
     return False
 
 def maybeZoomOut():
@@ -197,8 +259,13 @@ def chooseMap():
         notify('Sigh, maps image recog failed again.')
 
 def chooseMode():
-    global continue_run, img_collection
-    if exists( img_collection.collection_modes[map_mode_to_run] ):
+    global continue_run, img_collection, map_mode_to_run
+    notify("Check for map image: " + img_collection.collection_modes[map_mode_to_run].getFilename() )
+    try:
+        wait( img_collection.collection_modes[map_mode_to_run], 5)
+    except FindFailed:
+        notify('Something went wrong during choosing the mode. Find Failed.')
+    if exists( img_collection.collection_modes[map_mode_to_run], 5 ):
         click()
         sleep(0.5)
         notify('Hey man, I totally clicked on that map for you. Your welcome.')
@@ -213,9 +280,12 @@ def chooseMode():
         exit
 
 def startAutoRun():
-    global auto_run_count, continue_run, img_collection
+    global auto_run_count, continue_run, img_collection, rgn_bottom_right
     autorunning = False
     while not autorunning:
+        if exists( img_collection.img_declineinvite, 1 ):
+            click()
+            wait(2)
         try:
             rgn_auto = wait( img_collection.img_auto, 20 )
             hover( rgn_auto )
@@ -231,6 +301,7 @@ def startAutoRun():
     if continue_run == True:
         notify('Confirmed auto running clicked.')
         maybeBlessing()
+        open_lockboxes(1)
     
 def maybeBlessing():
     global img_collection
@@ -246,20 +317,44 @@ def waitForEndLevel():
     notify("Waiting for end of level now... will try twice then return to town")
     attempt = 1
     success = False
-    while attempt < 3 and not success and wait( img_collection.img_end_level, 300 ):
-        notify("End of level found, returning to town")
-        click ( img_collection.img_end_level )
-        wait( img_collection.img_return_to_town, 10 )
-        #image starts disabled wait a moment
-        sleep(1)
-        click( img_collection.img_return_to_town )
-        success = not exists( img_collection.img_end_level )
-        attempt = attempt + 1
-        return True
-    notify("End of level failed, safest course of action is to refresh.")
-    game.close()
-    continue_run = False
+    try:
+        while attempt < 3 and not success and wait( img_collection.img_end_level, 300 ):
+            notify("End of level found")
+            pickup_boss_drops()
+            click ( img_collection.img_end_level )
+            notify("Returning to town")
+            wait( img_collection.img_return_to_town, 10 )
+            #image starts disabled wait a moment
+            sleep(1)
+            click( img_collection.img_return_to_town )
+            success = not exists( img_collection.img_end_level )
+            attempt = attempt + 1
+            return True
+    except FindFailed:
+        notify("End of level failed, safest course of action is to refresh.")
+        #game.close()
+        click( img_collection.img_game_icon )
+        wait(6)
+        continue_run = False
     return False
+
+def pickup_boss_drops():
+    global pickups_on 
+    if True == pickups_on:
+        if exists( img_collection.img_boss_drops ):
+            notify("Picking up boss drops")
+            click()
+            click()
+            sleep(0.5)
+            click()
+            click()
+
+def failed_run_restart():
+    global img_collection, continue_run
+    if exists( img_collection.img_refresh, 2 ):
+        click()
+        wait(4)
+        continue_run = True
 
 def setup_game_regions(show = 0):
     global rgn_game, rgn_top_bar, rgn_top_left, rgn_top_right, rgn_bottom_left, rgn_bottom_right, img_collection
@@ -288,7 +383,7 @@ def setup_game_regions(show = 0):
         notify("Error: Game icon disappeared")
         return False
 
-op_play_type = ("autoplay", "autoplay-notify", "debug")
+op_play_type = ("autoplay", "autoplay-notify", "lockboxes", "debug")
 if( not force_start_mode ):
     option = select("Please choose a bot play type", options = op_play_type);
 else:
@@ -297,8 +392,14 @@ else:
 # main constructor (init run)
 while( running ):
     notify("Running Loop - moving to chosen play type.")
+    # if continue run is false, something went wrong last time
+    if False == continue_run:
+         failed_run_restart()
     if option == "debug":
         debug_run()
+        option = select("Please choose a bot play type", options = op_play_type);
+    elif option == "lockboxes":
+        open_lockboxes()
         option = select("Please choose a bot play type", options = op_play_type);
     elif option == "autoplay" or option == "autoplay-notify":
         if option == "autoplay-notify":
@@ -309,7 +410,7 @@ while( running ):
             logged_in = False
             sleep(5)
         else:
-            # Reset continue run since we are starting over here 
+            # Reset continue run since we are starting over here
             continue_run = True
             setup_game_regions()
             if False == logged_in:
