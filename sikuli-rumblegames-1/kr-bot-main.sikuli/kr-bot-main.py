@@ -13,7 +13,7 @@ Settings.DelayBeforeMouseDown = 0.5 # only applies to next click
 #setFindFailedResponse(PROMPT) # try forver on fail - doesn't seem to play nice right now
 
 # define globals
-pickups_on = False
+pickups_on = True
 force_start_mode = False
 #force_start_mode = "debug"
 debug_popups = False
@@ -75,10 +75,10 @@ else:
 
 def debug_run():
     setup_game_regions(1)
-    chooseMap()
-    chooseMode()
+    #chooseMap()
+    #chooseMode()
     #startAutoRun()
-    #waitForEndLevel()
+    waitForEndLevel()
     #moveToMapNPC()
     #map = Pattern(img_collection.collection_maps[map_to_run])
     #if exists(map,1):
@@ -321,27 +321,41 @@ def waitForEndLevel():
         while attempt < 3 and not success and wait( img_collection.img_end_level, 300 ):
             notify("End of level found")
             pickup_boss_drops()
-            click ( img_collection.img_end_level )
-            notify("Returning to town")
-            wait( img_collection.img_return_to_town, 10 )
-            #image starts disabled wait a moment
-            sleep(1)
-            click( img_collection.img_return_to_town )
-            success = not exists( img_collection.img_end_level )
-            attempt = attempt + 1
-            return True
+            sleep(0.5)
+            try:
+                click( img_collection.img_end_level )
+                notify("Returning to town")
+                wait( img_collection.img_return_to_town, 10 )
+                #image starts disabled wait a moment
+                sleep(1)
+                click( img_collection.img_return_to_town )
+                success = not exists( img_collection.img_end_level )
+                attempt = attempt + 1
+            except FindFailed:
+                notify("pickup boss drops likely caused failure... trying again")            
     except FindFailed:
         notify("End of level failed, safest course of action is to refresh.")
         #game.close()
         click( img_collection.img_game_icon )
         wait(6)
         continue_run = False
-    return False
-
+        return False
+    return True
 def pickup_boss_drops():
     global pickups_on 
     if True == pickups_on:
-        if exists( img_collection.img_boss_drops ):
+        if exists( img_collection.img_auto ):
+            try:
+                rgn_auto = wait( img_collection.img_auto, 20 )
+                hover( rgn_auto.offset(Location(0, 50)) )
+                mouse_click()
+                hover( rgn_auto )
+                mouse_click()
+                sleep(1)
+                mouse_click()
+            except FindFailed:
+                pass
+        elif exists( img_collection.img_boss_drops ):
             notify("Picking up boss drops")
             click()
             click()
